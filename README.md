@@ -19,13 +19,12 @@ npm install deduplicate-refs
 ```javascript
 const deduplicateRefs = require('deduplicate-refs');
 
-const text = `
+var text = `
 Some text with refs.<ref>{{cite|url=https://example.com|content1|content2}}</ref>
 More text.<ref>{{cite|url=https://example.com|content2|content1}}</ref>
-Even more text.<ref>https://example.com|content2|content1</ref>
+Even more text.<ref>{{cite|url=https://example.com|content2|content1}}</ref>
 `;
-const deduplicatedText = deduplicateRefs(text);
-
+var deduplicatedText = deduplicateRefs(text);
 console.log(deduplicatedText);
 ```
 

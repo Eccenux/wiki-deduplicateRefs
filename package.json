@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"description": "A module to deduplicate citations in <ref> tags based on their content.",
 	"main": "deduplicateRefs.js",
+	"type": "module",
 	"scripts": {
 		"test": "mocha test/deduplicateRefs.test.js"
 	},
