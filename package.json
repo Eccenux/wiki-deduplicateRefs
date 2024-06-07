@@ -26,6 +26,7 @@
 	"homepage": "https://github.com/Eccenux/deduplicate-refs#readme",
 	"devDependencies": {
 		"chai": "5.x",
+		"eslint": "8.x",
 		"mocha": "10.x"
 	}
 }
