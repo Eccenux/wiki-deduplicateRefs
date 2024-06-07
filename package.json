@@ -1,0 +1,30 @@
+{
+	"name": "deduplicate-refs",
+	"version": "1.0.0",
+	"description": "A module to deduplicate citations in <ref> tags based on their content.",
+	"main": "deduplicateRefs.js",
+	"scripts": {
+		"test": "mocha test/deduplicateRefs.test.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Eccenux/deduplicate-refs.git"
+	},
+	"keywords": [
+		"deduplicate",
+		"ref",
+		"wikitext",
+		"wikipedia",
+		"javascript"
+	],
+	"author": "Nux",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/Eccenux/deduplicate-refs/issues"
+	},
+	"homepage": "https://github.com/Eccenux/deduplicate-refs#readme",
+	"devDependencies": {
+		"chai": "5.x",
+		"mocha": "10.x"
+	}
+}
