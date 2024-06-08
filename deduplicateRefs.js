@@ -4,7 +4,7 @@ class Ref {
 		this.first = false;
 		this.duplicate = false;
 
-		this.name = 'dd:nn';
+		this.name = '';
 		this.attrs = parseAttributes(attr);
 		let limit = 0;
 		if ('name' in this.attrs) {
@@ -51,8 +51,16 @@ class Refs {
 			if (list.length <= 1) {
 				continue
 			}
-			// todo: figure out best name (if there is a name attr in the group)
-			let name = `dd:${no}`;
+			// figure out best name (if there is a name attr in the group)
+			let name = '';
+			for (const ref of list) {
+				if (ref.name.length && ref.name.length > name.length) {
+					name = ref.name;
+				}
+			}
+			if (!name.length) {
+				name = `dd:${no}`;
+			}
 			// finalize duplicates in this group
 			for (const ref of list) {
 				// add name to refs
