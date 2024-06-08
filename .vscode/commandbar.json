@@ -1,0 +1,26 @@
+// Remember to change VSC settings (UI): in `files.associations` add `commandbar.json: jsonc`
+{
+	"skipTerminateQuickPick": true,
+	"skipSwitchToOutput": false,
+	"skipErrorMessage": true,
+	"commands": [
+		// "commandType": "script" runs npm script directly
+		{
+			"text": "test",
+			"tooltip": "Run mocha tests.",
+			"color": "lightgreen",
+			"commandType": "script",
+			"command": "test",
+			"priority": 0
+		},
+		
+		{
+			"text": "build",
+			"tooltip": "Run the browserify build.",
+			"color": "lightgreen",
+			"commandType": "script",
+			"command": "build",
+			"priority": 0
+		}
+	]
+}
