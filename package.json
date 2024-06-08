@@ -1,5 +1,5 @@
 {
-	"name": "deduplicate-refs",
+	"name": "wiki-refdedu",
 	"version": "1.0.0",
 	"description": "A module to deduplicate citations in <ref> tags based on their content.",
 	"main": "deduplicateRefs.js",
@@ -16,8 +16,7 @@
 		"deduplicate",
 		"ref",
 		"wikitext",
-		"wikipedia",
-		"javascript"
+		"wikipedia"
 	],
 	"author": "Nux",
 	"license": "MIT",
@@ -28,6 +27,7 @@
 	"devDependencies": {
 		"chai": "5.x",
 		"eslint": "8.x",
-		"mocha": "10.x"
+		"mocha": "10.x",
+		"wikiploy": "2.x"
 	}
 }

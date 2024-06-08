@@ -1,5 +1,5 @@
 README.md
-# deduplicate-refs
+# Refdedu
 
 A module to deduplicate citations in `<ref>` tags in wikitext.
 
@@ -11,13 +11,13 @@ Duplicate ref is a tag that:
 ## Installation
 
 ```bash
-npm install deduplicate-refs
+npm install wiki-refdedu
 ```
 
-## Usage
+## Usage in NodeJS
 
 ```javascript
-const deduplicateRefs = require('deduplicate-refs');
+const deduplicateRefs = require('wiki-refdedu');
 
 var text = `
 Some text with refs.<ref>{{cite|url=https://example.com|content1|content2}}</ref>
@@ -28,12 +28,13 @@ var deduplicatedText = deduplicateRefs(text);
 console.log(deduplicatedText);
 ```
 
-## Tests
+## Test and build
 
 To run tests, use the following command:
 
 ```bash
 npm test
+npm run build
 ```
 
 ## Contributing
