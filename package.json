@@ -6,7 +6,11 @@
 	"type": "module",
 	"scripts": {
 		"test": "mocha",
-		"build": "node build.js"
+		"build": "node build.js",
+		"deploy-dev": "node wikiploy-dev.mjs",
+		"deploy": "node wikiploy.mjs",
+		"rollout-dev": "npm run build && npm run deploy-dev",
+		"rollout": "npm run build && npm run deploy"
 	},
 	"repository": {
 		"type": "git",

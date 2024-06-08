@@ -3,6 +3,7 @@
  * Reference de-duplication.
  * 
  * Should be lang-agnostic (should work on pl, en, de...).
+ * But is integrated with pl.wiki's [[WP:SK]].
  */
 /** Simple ref record. */
 class Ref {

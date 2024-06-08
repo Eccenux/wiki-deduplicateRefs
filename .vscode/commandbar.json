@@ -13,6 +13,23 @@
 			"commandType": "script",
 			"command": "build",
 			"priority": 0
+		},
+
+		{
+			"text": "rollout dev",
+			"tooltip": "Run build and deploy dev.",
+			"color": "lightgreen",
+			"commandType": "script",
+			"command": "rollout-dev",
+			"priority": 0
+		},
+		{
+			"text": "rollout all",
+			"tooltip": "Run build and deploy all.",
+			"color": "yellow",
+			"commandType": "script",
+			"command": "rollout",
+			"priority": 0
 		}
 	]
 }
