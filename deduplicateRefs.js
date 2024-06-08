@@ -1,16 +1,100 @@
-export function deduplicateRefs(text) {
-	const refTagPattern = /<ref>(.*?)<\/ref>/g;
-	let refs = {};
-	let refCounter = 1;
-
-	text = text.replace(refTagPattern, (all, content) => {
-		let normalized = normalizeContent(content);
-		if (refs[normalized]) {
-			return `<ref name="dd:${refs[normalized]}" />`;
-		} else {
-			refs[normalized] = refCounter++;
-			return `<ref name="dd:${refs[normalized]}">${content}</ref>`;
+/** Simple ref record. */
+class Ref {
+	constructor(attr, content) {
+		this.name = 'dd:nn';
+		this.attr = attr.trim();	// todo: parse attributes (`name="x"` != `name="x" group="notes"`)
+		this.content = content;
+		this.normalized = normalizeContent(content);
+		this.first = false;
+		this.duplicate = false;
+	}
+}
+class Refs {
+	constructor() {
+		this.refMap = {};
+		this.refs = [];
+	}
+	/**
+	 * Add ref.
+	 * @param {Ref} ref 
+	 */
+	add(ref) {
+		// todo: skip ref with group attr (or with any attr other then name)
+		// fill refs map
+		const normalized = ref.normalized;
+		if (!(normalized in this.refMap)) {
+			this.refMap[normalized] = [];
+			ref.first = true;
 		}
+		this.refMap[normalized].push(ref);
+		this.refs.push(ref);
+	}
+	/** 2nd pass for detecting duplicates. */
+	finalize() {
+		let no = 1;
+		// loop over groups
+		for (let list of Object.values(this.refMap)) {
+			// not a group of duplicates
+			if (list.length <= 1) {
+				continue
+			}
+			// todo: figure out best name (if there is a name attr in the group)
+			let name = `dd:${no}`;
+			// finalize duplicates in this group
+			for (const ref of list) {
+				// add name to refs
+				ref.name = name;
+				ref.duplicate = true;
+			}
+			no++;
+		}
+	}
+	/**
+	 * Check if the content is a duplicate.
+	 * @param {String} index Match or add index.
+	 * @param {String} content Just for sanity check. 
+	 * @returns {Ref} or false if not a duplicate.
+	 */
+	isdup(index, content) {
+		const ref = this.refs[index];
+		if (ref instanceof Ref) {
+			if (ref.content != content) {
+				console.error(`Contents don't match! Something went wrong`);
+			}
+			if (!ref.duplicate) {
+				return false;
+			}
+			return ref;
+		}
+	}
+}
+
+export function deduplicateRefs(text) {
+	const refTagPattern = /<ref([^>]*)>(.*?)<\/ref>/g;
+	let refs = new Refs();
+
+	// gather data
+	text = text.replace(refTagPattern, (all, attr, content) => {
+		refs.add(new Ref(attr, content));
+		return all;
+	});
+
+	// finalize data
+	refs.finalize();
+
+	// use data
+	let index = 0;
+	text = text.replace(refTagPattern, (all, attr, content) => {
+		let ref = refs.isdup(index, content);
+		index++;
+		// duplicate
+		if (ref instanceof Ref) {
+			if (ref.first) {
+				return `<ref name="${ref.name}">${content}</ref>`;
+			}
+			return `<ref name="${ref.name}" />`;
+		}
+		return all;
 	});
 
 	return text;
@@ -22,22 +106,25 @@ export function deduplicateRefs(text) {
  * @returns 
  */
 export function normalizeContent(content) {
+	let norm = content.trim();
+
 	// todo: url support
 	/*
 	this is: {{cite | url = https://abc.com }}
 	same as: https://abc.com
 	and the longer should always win (cite should be used; if both are cite then e.g. the one with archived url is better).
 	*/
-
+	
 	// is a template with params
-	if (content.indexOf('|') > 0) {
-		let tpl = content.trim();
+	if (norm.indexOf('|') > 0) {
 		// a single template
-		if (tpl.indexOf('{{') == 0 && tpl.indexOf('{{', 1) < 0) {
-			let {name, params} = prepareTpl(tpl);
+		if (norm.indexOf('{{') == 0 && norm.indexOf('{{', 1) < 0) {
+			let {name, params} = prepareTpl(norm);
 			return `${name}|${params.join('|')}}}`;
 		}
 	}
+
+	return norm;
 }
 
 /**
@@ -77,6 +164,13 @@ function usageCheck() {
 	
 	console.log(JSON.stringify(normalizeContent(` {{cite 1 | author=info1|title=info2 }}`)));
 	console.log(JSON.stringify(normalizeContent(`{{cite 1 | title=info2| author=info1}}`  )));
-	console.log(JSON.stringify(normalizeContent(`{{cite 2 | title=info2|author=info1}}`)));	
+	console.log(JSON.stringify(normalizeContent(`{{cite 2 | title=info2|author=info1}}`)));
+
+	const input = `
+	Some text with refs.<ref>abc</ref>
+	More text.<ref>def</ref>
+	Even more text.<ref>abc</ref>
+	`;
+	console.log(deduplicateRefs(input));
 }
 // usageCheck();

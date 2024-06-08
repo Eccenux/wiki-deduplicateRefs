@@ -112,6 +112,18 @@ describe('prepareTpl', () => {
 });
 
 describe('normalizeContent', () => {
+	it('should keep text as is', () => {
+		const inputs = [
+			'abc',
+			'|title=info2|author=info1',
+			'[[abc|def]]',
+		] ;
+		for (let input of inputs) {
+			const result = normalizeContent(input);
+			expect(result).to.equal(input);
+		}
+	});
+
 	it('should normalize and sort parameters in template content', () => {
 		const input1 = '{{cite 1 | author=info1|title=info2 }}';
 		const input2 = '{{cite 1 | title=info2|author=info1}}';
