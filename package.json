@@ -5,7 +5,8 @@
 	"main": "deduplicateRefs.js",
 	"type": "module",
 	"scripts": {
-		"test": "mocha test/deduplicateRefs.test.js"
+		"test": "mocha",
+		"build": "node build.js"
 	},
 	"repository": {
 		"type": "git",
