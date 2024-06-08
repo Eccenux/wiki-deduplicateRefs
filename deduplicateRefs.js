@@ -156,7 +156,35 @@ export function prepareTpl(content) {
 	return {name, params};
 }
 
+/**
+ * Parse attrs.
+ * @param {String} attributeString 
+ * @returns {Object} map.
+ */
+export function parseAttributes(attributeString) {
+	const attributes = {};
+
+	// standard attrs
+	attributeString = attributeString.replace(/(\w+)=["'](.*?)["']/g, (a, key, value)=>{
+		attributes[key] = value;
+		return "";
+	});
+	// malformed
+	attributeString = attributeString.trim().replace(/(\w+)=(\S+)/g, (a, key, value)=>{
+		attributes[key] = value;
+		return "";
+	});
+	// just the name?
+	attributeString = attributeString.trim();
+	if (attributeString.length) {
+		console.warn(`Unable to parse some attrs: ${attributeString}`);
+	}
+
+	return attributes;
+}
+
 // quick check
+// eslint-disable-next-line no-unused-vars
 function usageCheck() {
 	console.log(JSON.stringify(prepareTpl(`{{cite 1 | author=info1|title=info2 }}`)));
 	console.log(JSON.stringify(prepareTpl(`{{cite 1 | title=info2| author=info1}}`)));
@@ -166,11 +194,14 @@ function usageCheck() {
 	console.log(JSON.stringify(normalizeContent(`{{cite 1 | title=info2| author=info1}}`  )));
 	console.log(JSON.stringify(normalizeContent(`{{cite 2 | title=info2|author=info1}}`)));
 
-	const input = `
-	Some text with refs.<ref>abc</ref>
-	More text.<ref>def</ref>
-	Even more text.<ref>abc</ref>
-	`;
-	console.log(deduplicateRefs(input));
+	console.log(deduplicateRefs(`
+		Some text with refs.<ref>abc</ref>
+		More text.<ref>def</ref>
+		Even more text.<ref>abc</ref>
+	`));
+
+	// attrs
+	const parsedAttributes = parseAttributes(`name="x" group="notes"`);
+	console.log(parsedAttributes); // { name: 'x', group: 'notes' }
 }
 // usageCheck();

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { deduplicateRefs, normalizeContent, prepareTpl } from '../deduplicateRefs.js';
+import { deduplicateRefs, normalizeContent, prepareTpl, parseAttributes } from '../deduplicateRefs.js';
 
 describe('deduplicateRefs', () => {
 
@@ -156,5 +156,62 @@ describe('normalizeContent', () => {
 		input1 = '{{cite|a|b|title=info2|author=info1}}';
 		input2 = '{{cite|a|b|author=info1|title=info2}}';
 		expect(normalizeContent(input1)).to.equal(normalizeContent(input2));
+	});
+});
+
+describe('parseAttributes', () => {
+	it('should parse single attribute correctly', () => {
+		const input = 'name="xyz"';
+		const expected = { name: 'xyz' };
+		const result = parseAttributes(input);
+		expect(result).to.deep.equal(expected);
+	});
+
+	it('should parse multiple attributes correctly', () => {
+		const inputs = [
+			'name="x" group="notes"',
+			'   name="x"    group="notes"  ',
+		];
+		const expected = { name: 'x', group: 'notes' };
+		for (const input of inputs) {
+			const result = parseAttributes(input);
+			expect(result).to.deep.equal(expected, `Failed for input: ${input}`);
+		}
+	});
+
+	it('should handle attributes with various quotes', () => {
+		const inputs = [
+			`name='x' group='notes'`,
+			`name="x" group='notes'`,
+		];
+		const expected = { name: 'x', group: 'notes' };
+		for (const input of inputs) {
+			const result = parseAttributes(input);
+			expect(result).to.deep.equal(expected, `Failed for input: ${input}`);
+		}
+	});
+
+	it('should handle empty input', () => {
+		const inputs = [
+			``,
+			`  `,
+		];
+		const expected = {};
+		for (const input of inputs) {
+			const result = parseAttributes(input);
+			expect(result).to.deep.equal(expected, `Failed for input: ${input}`);
+		}
+	});
+
+	it('should handle malformed names', () => {
+		const inputs = [
+			`name=xyz`,
+			`name=xyz group='notes'`,
+		];
+		const expected = { name: 'xyz' };
+		for (const input of inputs) {
+			const result = parseAttributes(input);
+			expect(result.name).to.equal(expected.name, `Failed for input: ${input}`);
+		}
 	});
 });
