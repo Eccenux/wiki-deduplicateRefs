@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-const outPath = join('dist', 'deduplicateRefs.js');
+const outPath = join('dist', 'refdedu.js');
 mkdirSync('dist', { recursive: true });
 
 function build(code) {
