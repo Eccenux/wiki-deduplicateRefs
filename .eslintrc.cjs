@@ -8,6 +8,9 @@ module.exports = {
 		"it": true,
 		"describe": true,
 	},
+	"ignorePatterns": [
+		"dist/*",
+	],
 	"extends": "eslint:recommended",
 	"overrides": [{
 		"env": {

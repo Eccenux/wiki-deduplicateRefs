@@ -4,10 +4,16 @@ import { join } from 'path';
 const outPath = join('dist', 'deduplicateRefs.js');
 mkdirSync('dist', { recursive: true });
 
-const fileContent = readFileSync('deduplicateRefs.js', 'utf8');
+function build(code) {
+	// remove export keyword
+	code = code.replace(/^export /gm, '');
+	// add isolation
+	code = `(function(){\n${code}\nwindow.deduplicateRefs = deduplicateRefs;\n})();`;
 
-const updatedContent = fileContent.replace(/^export /gm, '');
+	return code;
+}
+let code = readFileSync('deduplicateRefs.js', 'utf8');
+code = build(code);
+writeFileSync(outPath, code, 'utf8');
 
-writeFileSync(outPath, updatedContent, 'utf8');
-
-console.log('Removed export keywords from', outPath);
+console.log('Build done. Output: ', outPath);

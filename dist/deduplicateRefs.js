@@ -1,3 +1,9 @@
+(function(){
+/**
+ * Reference de-duplication.
+ * 
+ * Should be lang-agnostic (should work on pl, en, de...).
+ */
 /** Simple ref record. */
 class Ref {
 	constructor(attr, content) {
@@ -203,3 +209,6 @@ function parseAttributes(attributeString) {
 
 	return attributes;
 }
+
+window.deduplicateRefs = deduplicateRefs;
+})();
