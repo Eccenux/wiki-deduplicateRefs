@@ -51,7 +51,18 @@ Even more text.<ref name="dd:1" />
 `;
 		expect(deduplicateRefs(input)).to.equal(expected);
 	});
-	
+
+	it('should skip grouped refs', () => {
+		const inputs = [
+			`A.<ref>abc</ref> B.<ref group="notes">abc</ref>`,
+			`A.<ref name="abc">abc</ref> B.<ref name="abc" group="notes">abc</ref>`,
+		];
+		for (const input of inputs) {
+			const expected = input;
+			expect(deduplicateRefs(input)).to.equal(expected);
+		}
+	});
+
 	it('should keep existing name', () => {
 		const input = `
 A<ref name="info12">{{cite|author=info1|title=info2}}</ref>

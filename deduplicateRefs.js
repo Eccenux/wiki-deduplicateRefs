@@ -1,12 +1,23 @@
 /** Simple ref record. */
 class Ref {
 	constructor(attr, content) {
-		this.name = 'dd:nn';
-		this.attr = attr.trim();	// todo: parse attributes (`name="x"` != `name="x" group="notes"`)
-		this.content = content;
-		this.normalized = normalizeContent(content);
 		this.first = false;
 		this.duplicate = false;
+
+		this.name = 'dd:nn';
+		this.attrs = parseAttributes(attr);
+		let limit = 0;
+		if ('name' in this.attrs) {
+			this.name = this.attrs.name;
+			limit++;
+		}
+		// skip ref with group attr (or with any attr other then name)
+		if (Object.keys(this.attrs).length > limit) {
+			this.skip = true;
+		} else {
+			this.content = content;
+			this.normalized = normalizeContent(content);
+		}
 	}
 }
 class Refs {
@@ -19,7 +30,9 @@ class Refs {
 	 * @param {Ref} ref 
 	 */
 	add(ref) {
-		// todo: skip ref with group attr (or with any attr other then name)
+		if (ref.skip) {
+			return;
+		}
 		// fill refs map
 		const normalized = ref.normalized;
 		if (!(normalized in this.refMap)) {
