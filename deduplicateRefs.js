@@ -208,3 +208,25 @@ export function parseAttributes(attributeString) {
 
 	return attributes;
 }
+
+if (typeof mw === 'object') {
+	// eslint-disable-next-line no-undef
+	mw.hook('userjs.wp_sk.ready').add(function (wp_sk) {
+		let orig_cleanerWikiVaria = wp_sk.cleanerWikiVaria;
+	
+		wp_sk.cleanerWikiVaria = function(str) {
+			// oryginalny cleaner
+			str = orig_cleanerWikiVaria.apply(this, arguments);
+	
+			// dodatek
+			let mod = deduplicateRefs(str);
+			// info jeśli zmienione
+			if (mod != str) {
+				wp_sk.extension += "+[[User:Nux/Refdedu|Refdedu]]";
+				str = mod;
+			}
+	
+			return str;
+		};
+	});
+}
