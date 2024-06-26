@@ -13,5 +13,14 @@
 			],
 			"program": "${workspaceFolder}\\${file}"
 		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Run test_long.js",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"program": "${workspaceFolder}\\test_long.js"
+		},
 	]
 }

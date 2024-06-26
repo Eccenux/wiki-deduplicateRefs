@@ -15,6 +15,8 @@ B<ref name="dd:1" />
 C<ref name="dd:1" />
 `;
 		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
 	});
 
 	it('should treat different order of parameters as duplicates', () => {
@@ -27,6 +29,8 @@ A<ref name="dd:1">{{cite|author=info1|title=info2}}</ref>
 B<ref name="dd:1" />
 `;
 		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
 	});
 
 	it('should keep unique refs intact', () => {
@@ -36,6 +40,8 @@ B<ref name="dd:1" />
 `;
 		const expected = input;
 		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
 	});
 
 	it('should only assign unique names when needed', () => {
@@ -50,6 +56,8 @@ More text.<ref>def</ref>
 Even more text.<ref name="dd:1" />
 `;
 		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
 	});
 
 	it('should skip grouped refs', () => {
@@ -84,6 +92,8 @@ A<ref name="info12">{{cite|author=info1|title=info2}}</ref>
 B<ref name="info12" />
 `;
 		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
 	});
 
 
@@ -103,6 +113,8 @@ B<ref name="info12" />
 <ref name="dd:2" />
 `;
 		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
 	});
 });
 

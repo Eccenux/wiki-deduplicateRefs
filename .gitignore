@@ -2,3 +2,6 @@
 *.lnk
 *.priv.*
 bot.config.*
+test_long_refs.*
+test_long_in.*
+test_long_out.*

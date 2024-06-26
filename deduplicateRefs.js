@@ -96,15 +96,40 @@ class Refs {
 	}
 }
 
-export function deduplicateRefs(text) {
-	const refTagPattern = /<ref([^>]*)>(.*?)<\/ref>/g;
+/**
+ * Main (find and resolve duplicates).
+ * @param {String} text wikitext.
+ * @param {fs} fs Node.js FS module for debug.
+ * @returns 
+ */
+export function deduplicateRefs(text, fs=false) {
+	const refTagPattern = /<ref([^>/]*)>(.+?)<\/ref>/g; // non-empty ref
+	// const shortRefPattern = /<ref([^>/]*)\/>/g; // empty ref (ref to ref)
 	let refs = new Refs();
+	
+	// debug
+	var temp_names = new Set();
+	var temp_all = new Set();
+	// gather data of non-empty refs
+	text.replace(refTagPattern, (all, attr, content) => {
+		// check if there was a matching problem
+		if (all.indexOf('<ref', 2) > 0) {
+			throw `invalid match: ${all}`;
+		}
 
-	// gather data
-	text = text.replace(refTagPattern, (all, attr, content) => {
-		refs.add(new Ref(attr, content));
-		return all;
+		const ref = new Ref(attr, content);
+		refs.add(ref);
+		if (fs) {
+			if (ref.name && ref.name.length) {
+				temp_names.add(ref.name);
+			}
+			temp_all.add(all);
+		}
 	});
+	if (fs) {
+		console.log(temp_names);
+		fs.writeFileSync("test_long_refs.mediawiki", [...temp_all].sort().join('\n'));
+	}
 
 	// finalize data
 	refs.finalize();
@@ -134,6 +159,11 @@ export function deduplicateRefs(text) {
  */
 export function normalizeContent(content) {
 	let norm = content.trim();
+
+	if (!content.length) {
+		console.error("empty content not supported in normalization");
+		return "-";
+	}
 
 	// todo: url support
 	/*
