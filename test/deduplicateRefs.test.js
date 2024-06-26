@@ -116,6 +116,48 @@ B<ref name="info12" />
 		// same in single line
 		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
 	});
+
+	it('should replace names of already named refs', () => {
+		let input, expected;
+
+		// c1.2 should be replaced with c1.1 also in a tag that already doesn't have a name
+		input = `
+			ż<ref name="c1.1">content1</ref>
+			ó<ref name="c1.2">content1</ref>
+			ł<ref name="c1.2" />
+		`.replace(/[\r\n]+[ \t]+/g, '\n');
+		expected = `
+			ż<ref name="c1.1">content1</ref>
+			ó<ref name="c1.1" />
+			ł<ref name="c1.1" />
+		`.replace(/[\r\n]+[ \t]+/g, '\n');
+		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
+
+		// similar but more other refs
+		input = `
+			ż<ref name="c1.1">content1</ref>
+			ó<ref name="c2.1">content2</ref>
+			ł<ref>unique</ref>
+			ć<ref name="c1.2">content1</ref>
+			ą<ref name="c2.2">content2</ref>
+			ź<ref name="c1.2" />
+			ń<ref name="c1.2"/>
+		`.replace(/[\r\n]+[ \t]+/g, '\n');
+		expected = `
+			ż<ref name="c1.1">content1</ref>
+			ó<ref name="c2.1">content2</ref>
+			ł<ref>unique</ref>
+			ć<ref name="c1.1" />
+			ą<ref name="c2.1" />
+			ź<ref name="c1.1" />
+			ń<ref name="c1.1" />
+		`.replace(/[\r\n]+[ \t]+/g, '\n');
+		expect(deduplicateRefs(input)).to.equal(expected);
+		// same in single line
+		expect(deduplicateRefs(input.replace(/[\r\n]+/g, ' '))).to.equal(expected.replace(/[\r\n]+/g, ' '));
+	});
 });
 
 describe('prepareTpl', () => {

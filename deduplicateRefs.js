@@ -21,14 +21,21 @@ class Ref {
 		if (Object.keys(this.attrs).length > limit) {
 			this.skip = true;
 		} else {
-			this.content = content;
-			this.normalized = normalizeContent(content);
+			if (content.length) {
+				this.content = content;
+				this.normalized = normalizeContent(content);
+			} else {
+				this.content = this.normalized = false;
+			}
 		}
 	}
 }
 class Refs {
 	constructor() {
+		/** normalized → ref list */
 		this.refMap = {};
+		/** removed → winner  */
+		this.nameMap = {};
 		this.refs = [];
 	}
 	/**
@@ -69,6 +76,7 @@ class Refs {
 			}
 			// finalize duplicates in this group
 			for (const ref of list) {
+				this.nameMap[ref.name] = name;
 				// add name to refs
 				ref.name = name;
 				ref.duplicate = true;
@@ -87,6 +95,7 @@ class Refs {
 		if (ref instanceof Ref) {
 			if (ref.content != content) {
 				console.error(`Contents don't match! Something went wrong`);
+				return false;
 			}
 			if (!ref.duplicate) {
 				return false;
@@ -104,7 +113,7 @@ class Refs {
  */
 export function deduplicateRefs(text, fs=false) {
 	const refTagPattern = /<ref([^>/]*)>(.+?)<\/ref>/g; // non-empty ref
-	// const shortRefPattern = /<ref([^>/]*)\/>/g; // empty ref (ref to ref)
+	const shortRefPattern = /<ref([^>/]*)\/>/g; // empty ref (ref to ref)
 	let refs = new Refs();
 	
 	// debug
@@ -134,7 +143,23 @@ export function deduplicateRefs(text, fs=false) {
 	// finalize data
 	refs.finalize();
 
-	// use data
+	// for <ref name="removed"/> replace with a name of a winner
+	text = text.replace(shortRefPattern, (all, attr) => {
+		const ref = new Ref(attr, '');
+		if (ref.skip) {
+			return all;
+		}
+		if (!ref.name || !ref.name.length) {
+			return all;
+		}
+		if (ref.name in refs.nameMap) {
+			let name = refs.nameMap[ref.name];
+			return `<ref name="${name}" />`;
+		}
+		return all;
+	});
+
+	// use data to replace duplicates
 	let index = 0;
 	text = text.replace(refTagPattern, (all, attr, content) => {
 		let ref = refs.isdup(index, content);
