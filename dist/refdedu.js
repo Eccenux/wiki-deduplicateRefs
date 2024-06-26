@@ -22,14 +22,21 @@ class Ref {
 		if (Object.keys(this.attrs).length > limit) {
 			this.skip = true;
 		} else {
-			this.content = content;
-			this.normalized = normalizeContent(content);
+			if (content.length) {
+				this.content = content;
+				this.normalized = normalizeContent(content);
+			} else {
+				this.content = this.normalized = false;
+			}
 		}
 	}
 }
 class Refs {
 	constructor() {
+		/** normalized → ref list */
 		this.refMap = {};
+		/** removed → winner  */
+		this.nameMap = {};
 		this.refs = [];
 	}
 	/**
@@ -70,6 +77,7 @@ class Refs {
 			}
 			// finalize duplicates in this group
 			for (const ref of list) {
+				this.nameMap[ref.name] = name;
 				// add name to refs
 				ref.name = name;
 				ref.duplicate = true;
@@ -88,6 +96,7 @@ class Refs {
 		if (ref instanceof Ref) {
 			if (ref.content != content) {
 				console.error(`Contents don't match! Something went wrong`);
+				return false;
 			}
 			if (!ref.duplicate) {
 				return false;
@@ -97,20 +106,61 @@ class Refs {
 	}
 }
 
-function deduplicateRefs(text) {
-	const refTagPattern = /<ref([^>]*)>(.*?)<\/ref>/g;
+/**
+ * Main (find and resolve duplicates).
+ * @param {String} text wikitext.
+ * @param {fs} fs Node.js FS module for debug.
+ * @returns 
+ */
+function deduplicateRefs(text, fs=false) {
+	const refTagPattern = /<ref([^>/]*)>(.+?)<\/ref>/g; // non-empty ref
+	const shortRefPattern = /<ref([^>/]*)\/>/g; // empty ref (ref to ref)
 	let refs = new Refs();
+	
+	// debug
+	var temp_names = new Set();
+	var temp_all = new Set();
+	// gather data of non-empty refs
+	text.replace(refTagPattern, (all, attr, content) => {
+		// check if there was a matching problem
+		if (all.indexOf('<ref', 2) > 0) {
+			throw `invalid match: ${all}`;
+		}
 
-	// gather data
-	text = text.replace(refTagPattern, (all, attr, content) => {
-		refs.add(new Ref(attr, content));
-		return all;
+		const ref = new Ref(attr, content);
+		refs.add(ref);
+		if (fs) {
+			if (ref.name && ref.name.length) {
+				temp_names.add(ref.name);
+			}
+			temp_all.add(all);
+		}
 	});
+	if (fs) {
+		console.log(temp_names);
+		fs.writeFileSync("test_long_refs.mediawiki", [...temp_all].sort().join('\n'));
+	}
 
 	// finalize data
 	refs.finalize();
 
-	// use data
+	// for <ref name="removed"/> replace with a name of a winner
+	text = text.replace(shortRefPattern, (all, attr) => {
+		const ref = new Ref(attr, '');
+		if (ref.skip) {
+			return all;
+		}
+		if (!ref.name || !ref.name.length) {
+			return all;
+		}
+		if (ref.name in refs.nameMap) {
+			let name = refs.nameMap[ref.name];
+			return `<ref name="${name}" />`;
+		}
+		return all;
+	});
+
+	// use data to replace duplicates
 	let index = 0;
 	text = text.replace(refTagPattern, (all, attr, content) => {
 		let ref = refs.isdup(index, content);
@@ -135,6 +185,11 @@ function deduplicateRefs(text) {
  */
 function normalizeContent(content) {
 	let norm = content.trim();
+
+	if (!content.length) {
+		console.error("empty content not supported in normalization");
+		return "-";
+	}
 
 	// todo: url support
 	/*
