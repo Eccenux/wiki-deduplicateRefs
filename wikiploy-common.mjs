@@ -34,7 +34,9 @@ function isValid(summaryDate) {
 		return false;
 	}
 
-	const today = new Date().toISOString().slice(0, 10);
+	//This is no good, UTC: new Date().toISOString().slice(0, 10);
+	// This works because sv (Swedish) uses ISO format
+	const today = new Date().toLocaleDateString("sv");
 	return summaryDate.date === today;
 }
 
