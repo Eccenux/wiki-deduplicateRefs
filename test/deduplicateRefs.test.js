@@ -71,6 +71,53 @@ Even more text.<ref name="dd:1" />
 		}
 	});
 
+	it('should skip references-group tag', () => {
+		const inputs = [
+			`
+=== Pierwsze użycie ===
+Użycie note1 i 2<ref group=mini name=note1 /><ref group=mini name=note2 />.
+
+=== Uwagi lista2.1 ===
+<references group=mini>
+<ref name="note1">n1</ref>
+<ref name="note2">n2</ref>
+</references>
+
+=== Drugie użycie ===
+Użycie note1 i 2<ref group=mini name=note1 /><ref group=mini name=note2 />.
+
+=== Uwagi lista2.2 ===
+<references group=mini>
+<ref name="note1">n1</ref>
+<ref name="note2">n2</ref>
+</references>
+			`.trim(),
+			`
+=== Pierwsze użycie ===
+Użycie note1 i 2<ref group="mini" name=note1 /><ref group="mini" name=note2 />.
+
+=== Uwagi lista2.1 ===
+<references group="mini">
+<ref name="note1">n1</ref>
+<ref name="note2">n2</ref>
+</references>
+
+=== Drugie użycie ===
+Użycie note1 i 2<ref group="mini" name=note1 /><ref group="mini" name=note2 />.
+
+=== Uwagi lista2.2 ===
+<references group="mini">
+<ref name="note1">n1</ref>
+<ref name="note2">n2</ref>
+</references>
+			`.trim(),
+		];
+		for (const input of inputs) {
+			const expected = input;
+			expect(deduplicateRefs(input)).to.equal(expected);
+		}
+	});
+
 	it('should keep existing name', () => {
 		const input = `
 A<ref name="info12">{{cite|author=info1|title=info2}}</ref>
