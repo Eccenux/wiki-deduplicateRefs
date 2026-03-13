@@ -1,15 +1,17 @@
-import { Wikiploy, setupSummary } from 'wikiploy';
+import { Wikiploy, verlib } from 'wikiploy';
 
 import * as botpass from './bot.config.mjs';
 const ployBot = new Wikiploy(botpass);
 
 // common deploy function(s)
-import { addConfig, addConfigRelease } from './wikiploy-common.mjs';
+import { addConfig, addConfigRelease, setupSummaryDated } from './wikiploy-common.mjs';
 
 // run asynchronously to be able to wait for results
 (async () => {
-	// custom summary from a prompt
-	await setupSummary(ployBot);
+	// opis zmian: wdrożenie jeśli data opisu zmian się zgadza
+	const summaryDate = { date: '2026-03-13', text: 'Poprawka: działania z wielokrotnymi listami uwag #1' };
+	const version = await verlib.readVersion('./package.json');
+	setupSummaryDated(ployBot, summaryDate, version);
 
 	// push out file(s) to wiki
 	const configs = [];
