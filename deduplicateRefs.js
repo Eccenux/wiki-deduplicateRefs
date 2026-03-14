@@ -1,3 +1,5 @@
+const logTag = '[Refdedu]';
+
 /**
  * Reference de-duplication.
  * 
@@ -94,7 +96,7 @@ class Refs {
 		const ref = this.refs[index];
 		if (ref instanceof Ref) {
 			if (ref.content != content) {
-				console.error(`Contents don't match! Something went wrong`);
+				console.error(logTag, `Contents don't match! Something went wrong`);
 				return false;
 			}
 			if (!ref.duplicate) {
@@ -111,7 +113,7 @@ class Refs {
  * @param {fs} fs Node.js FS module for debug.
  * @returns 
  */
-export function deduplicateRefs(text, fs=false) {
+export function deduplicateRefs(text, {fs=false, stats=false}={}) {
 	const refTagPattern = /<ref([^>/]*)>(.+?)<\/ref>/g; // non-empty ref
 	const shortRefPattern = /<ref([^>/]*)\/>/g; // empty ref (ref to ref)
 	let refs = new Refs();
@@ -165,19 +167,33 @@ export function deduplicateRefs(text, fs=false) {
 
 	// use data to replace duplicates
 	let index = 0;
+	let replacementCount = 0; // for stats
+	let names = new Set(); // for stats
 	text = text.replace(refTagPattern, (all, attr, content) => {
 		let ref = refs.isdup(index, content);
 		index++;
 		// duplicate
 		if (ref instanceof Ref) {
+			names.add(ref.name);
 			if (ref.first) {
+				replacementCount++;
 				return `<ref name="${ref.name}">${content}</ref>`;
 			}
+			replacementCount++;
 			return `<ref name="${ref.name}" />`;
 		}
 		return all;
 	});
 
+	if (fs) {
+		let statsInfo = JSON.stringify({replacementCount, nameCount:names.size});
+		console.log('stats:', statsInfo, JSON.stringify(Array.from(names)));
+		fs.writeFileSync("test_long_refs.stats.mediawiki", statsInfo + '\n' + Array.from(names).join(','));
+	}
+
+	if (stats) {
+		return {mod:text, replacementCount, names};
+	}
 	return text;
 }
 
@@ -190,7 +206,7 @@ export function normalizeContent(content) {
 	let norm = content.trim();
 
 	if (!content.length) {
-		console.error("empty content not supported in normalization");
+		console.error(logTag, "empty content not supported in normalization");
 		return "-";
 	}
 
@@ -263,7 +279,7 @@ export function parseAttributes(attributeString) {
 	// just the name?
 	attributeString = attributeString.trim();
 	if (attributeString.length) {
-		console.warn(`Unable to parse some attrs: ${attributeString}`);
+		console.warn(logTag, `Unable to parse some attrs: ${attributeString}`);
 	}
 
 	return attributes;
@@ -279,10 +295,12 @@ if (typeof mw === 'object') {
 			str = orig_cleanerWikiVaria.apply(this, arguments);
 	
 			// dodatek
-			let mod = deduplicateRefs(str);
+			let {mod, replacementCount, names} = deduplicateRefs(str, {stats:true});
 			// info jeśli zmienione
 			if (mod != str) {
-				wp_sk.extension += "+[[User:Nux/Refdedu|Refdedu]]";
+				let nameArr = Array.from(names);
+				//console.log(logTag, {replacementCount, nameArr});
+				wp_sk.extension += ` + [[User:Nux/Refdedu|Refdedu]] (l.zmian: ${replacementCount}, ref: ${nameArr.join(', ')})`;
 				str = mod;
 			}
 	

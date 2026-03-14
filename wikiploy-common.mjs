@@ -54,7 +54,7 @@ function isValid(summaryDate) {
  * @param {string} version Optional version string. If provided, it will be prefixed in the summary.
  * @param {string} standardSummary Fallback summary text used when `summaryDate.text` is empty.
  */
-export function setupSummaryDated(ployBot, summaryDate = {}, version = '', standardSummary = 'Ploy from Github') {
+export function setupSummaryDated(ployBot, summaryDate = {}, version = '', standardSummary = 'Wdrożenie z Github') {
 	if (!isValid(summaryDate)) {
 		throw new Error("summaryDate is invalid, make sure date is current (and text too :-))");
 	}
