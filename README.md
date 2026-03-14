@@ -37,6 +37,8 @@ npm test
 npm run build
 ```
 
+Integration/E2E tests: https://pl.wikipedia.org/wiki/Wikipedysta:Nux/test/refdedu
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
