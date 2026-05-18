@@ -10,6 +10,8 @@ Duplicate ref is a tag that:
 
 ## Installation
 
+Tests and linter require at least Node v20.19.0. Basic stuff should be fine with v18.18.0.
+
 ```bash
 npm install wiki-refdedu
 ```

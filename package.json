@@ -1,11 +1,12 @@
 {
 	"name": "wiki-refdedu",
-	"version": "1.2.0",
+	"version": "1.3.0",
 	"description": "A module to deduplicate citations in <ref> tags based on their content.",
 	"main": "deduplicateRefs.js",
 	"type": "module",
 	"scripts": {
-		"test": "mocha",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"build": "node build.js",
 		"deploy-dev": "node wikiploy-dev.mjs",
 		"deploy": "node wikiploy.mjs",
@@ -29,9 +30,8 @@
 	},
 	"homepage": "https://github.com/Eccenux/deduplicate-refs#readme",
 	"devDependencies": {
-		"chai": "6.x",
 		"eslint": "9.x",
-		"mocha": "11.x",
+		"vitest": "^4.1.6",
 		"wikiploy": "2.x"
 	}
 }

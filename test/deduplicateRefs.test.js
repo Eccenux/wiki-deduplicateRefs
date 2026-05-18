@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, it, expect } from 'vitest';
 import { deduplicateRefs, normalizeContent, prepareTpl, parseAttributes } from '../deduplicateRefs.js';
 
 describe('deduplicateRefs', () => {
