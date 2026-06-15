@@ -9,7 +9,7 @@ import { addConfig, addConfigRelease, setupSummaryDated } from './wikiploy-commo
 // run asynchronously to be able to wait for results
 (async () => {
 	// opis zmian: wdrożenie jeśli data opisu zmian się zgadza
-	const summaryDate = { date: '2026-03-14', text: 'Statystyki zmian (duplikatów)' };
+	const summaryDate = { date: '2026-06-15', text: 'remove space from end tags' };
 	const version = await verlib.readVersion('./package.json');
 	setupSummaryDated(ployBot, summaryDate, version);
 

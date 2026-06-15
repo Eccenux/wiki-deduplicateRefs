@@ -123,6 +123,8 @@ function deduplicateRefs(text, {fs=false, stats=false}={}) {
 	var temp_names = new Set();
 	var temp_all = new Set();
 	text
+		// remove space from end tags
+		.replaceAll(/<\s*\/\s*ref\s*>/g, '</ref>')
 		// remove grouped ref-list
 		.replaceAll(/<references[^>]*[^a-z]group *=[^>]+>[\s\S]+?<\/references>/g, '')
 		// gather data of non-empty refs
